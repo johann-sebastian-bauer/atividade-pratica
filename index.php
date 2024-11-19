@@ -2,18 +2,26 @@
 include "dbconn.php";
 $sql = "select id_cliente, chamado.ID as chamado_ID, status_chamado, criticidade, data_abertura, cliente.nome as nome_cliente, colaborador.nome as nome_colaborador from chamado inner join cliente on cliente.ID = id_cliente inner join colaborador on colaborador.ID = chamado.id_colaborador where 1 = 1 ";
 if($_SERVER["REQUEST_METHOD"] == "POST"){
- if(isset($_POST["criticidade"])){
-    $criticidade = $_POST["criticidade"];
-    $sql .= "and criticidade = '$criticidade' ";
- }
- $status = $_POST["status"];
- $colaborador = $_POST["colaborador"];
- if($status != "selecione"){
-    $sql .= "and status_chamado = '$status' ";
- }
- if($colaborador != "selecione"){
-    $sql .= "and colaborador.nome = '$colaborador' ";
- }
+    if(isset($_POST['id'])){
+        $sql = "update chamado
+        set status_chamado = " . $_POST['status'] . ",
+         set fk_colaborador = ". $_POST['colaborador'] . '
+         where id = ' . $_POST['id'];
+    }
+    else{
+        if(isset($_POST["criticidade"])){
+            $criticidade = $_POST["criticidade"];
+            $sql .= "and criticidade = '$criticidade' ";
+        }
+        $status = $_POST["status"];
+        $colaborador = $_POST["colaborador"];
+        if($status != "selecione"){
+            $sql .= "and status_chamado = '$status' ";
+        }
+        if($colaborador != "selecione"){
+            $sql .= "and colaborador.nome = '$colaborador' ";
+        }
+    }
 }
 $sql .= "order by status_chamado, criticidade ";
  $result = $conn -> query($sql);
@@ -73,16 +81,20 @@ $sql .= "order by status_chamado, criticidade ";
                 <?php 
                     if(isset($result) && $result -> num_rows > 0){
                         while($row = $result -> fetch_assoc()){
-                            echo "<form action='index.php' method='POST'> <tr>
-                            <input type='hidden' value='" . $row['chamado_ID'] . "'
+                            echo " <tr>
+                            <input type='hidden' value='" . $row['chamado_ID'] . "' name='id' id='id'> 
                             <td> {$row['nome_cliente']} </td>
                             <td> {$row['nome_colaborador']} </td>
                             <td> {$row['status_chamado']} </td>
                             <td> {$row['criticidade']} </td>
                             <td> {$row['data_abertura']} </td>
-                            <td> <a href='editarUsuario.php?id='><button >Editar</button></a> </td>
+                            <td> 
+                            <form action='alterar_chamado.php' method='POST'>
+                            <input type='hidden' value='" . $row['chamado_ID'] . "' name='id' id='id'> 
+                            <input type='submit' value='Enviar'>
+                            </form> </td>
                             </tr>
-                            </form>";
+                            ";
                         }
                         
                     }

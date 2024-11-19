@@ -1,7 +1,7 @@
 <?php
 include "../dbconn.php";
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
-            $sql = 'select distinct nome from colaborador';
+            $sql = 'select distinct nome, id from colaborador';
 
         $result = $conn -> query($sql);
         if ($result -> num_rows > 0){
